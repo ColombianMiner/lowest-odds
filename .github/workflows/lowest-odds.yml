@@ -1,0 +1,47 @@
+name: Lowest odds
+
+on:
+  workflow_dispatch:
+    inputs:
+      sports:
+        description: "Sports to scan (nba, nfl, nhl, ncaab... or all)"
+        default: "nba"
+        required: false
+      max_credits:
+        description: "Stop if a run would cost more Odds API credits than this"
+        default: "500"
+        required: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: lowest-odds
+  cancel-in-progress: true
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Pull odds and build reports
+        env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+          SPORTS: ${{ inputs.sports || 'nba' }}
+          MAX_CREDITS: ${{ inputs.max_credits || '500' }}
+          LOWEST_ODDS_OUT: site
+        run: python lowest_odds.py
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deploy
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,6 @@
+.odds_api_key
+site/
+__pycache__/
+lowest_odds_*.html
+lowest_odds_debug.txt
+lowest_odds_all_lines.csv
