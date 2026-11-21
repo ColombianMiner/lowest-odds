@@ -1,6 +1,10 @@
 name: Lowest odds
 
 on:
+  # Claude can start a run from chat by updating the .run file
+  push:
+    branches: [main]
+    paths: [".run"]
   workflow_dispatch:
     inputs:
       sports:
